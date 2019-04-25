@@ -1,0 +1,90 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html"%}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+
+
+
+<div class="container">
+	{% if current_user.is_authenticated() %}
+		<div class="row">
+			<div class="pull-right">
+				 <div class="pull-right">
+						  	<a class="btn btn-primary " style="margin-right: 20px; margin-bottom: 20px;" href="{{url_for('newitem',category_id=active_category_id and active_category_id.id or 0)}}">ADD ITEM</a>
+				  </div>
+			</div>
+		</div>
+	{%endif%}
+
+      <div class="row row-offcanvas row-offcanvas-right">
+
+
+		  <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+          <div class="list-group">
+			  {% for category_id in categories_ids %}
+			  <a style="font-size: 25px;" class="list-group-item" href="{{url_for('showcategory', category_id = category_id.id)}}">{{category_id.name}}</a>
+			  {% endfor %}
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-9">
+
+
+
+			<div class="panel panel-default">
+			  <div class="panel-heading">
+				<h3 class="panel-title">
+				{% if active_category_id %}
+				{{ active_category_id.name }}
+				{% else %}
+							Latest Items
+				{% endif %}
+				</h3>
+				<div></div>
+
+			  </div>
+
+			  <div class="panel-body">
+				<table class="table table-border">
+					<thead>
+					<tr>
+						<th>Item Name</th>
+						<th>Item Desc</th>
+						{% if current_user.is_authenticated() %}
+							<th>Action</th>
+						{%endif%}
+					</tr>
+					</thead>
+					<tbody>
+				{% for item_id in item_ids %}
+					<tr>
+						<td>{{item_id.name}}</td>
+						<td>{{item_id.description}}</td>
+						{% if current_user.is_authenticated() %}
+							<td>
+								{% if current_user.id == item_id.user_id %}
+									<a class="btn btn-info" href='{{url_for('edititem', item_id=item_id.id)}}'> <span class="glyphicon glyphicon-edit"></span></a>
+									<a class="btn btn-danger" href='{{url_for('deleteitem', item_id=item_id.id)}}'> <span class="glyphicon glyphicon-remove"></span></a>
+								{%endif%}
+							</td>
+						{%endif%}
+					</tr>
+				{% endfor %}
+					</tbody>
+				</table>
+
+			  </div>
+			</div>
+
+        </div>
+
+
+      </div>
+
+
+
+    </div>
+
+{% endblock %}

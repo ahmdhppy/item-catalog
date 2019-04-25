@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html"%}
+
+
+<div class="container">
+	<h1 class="" style="margin-bottom: 40px;">Delete Item</h2>
+
+		<div class="alert alert-danger" role="alert" style="height: 100px;">
+			Are you sure you want to delete '{{item_id.name}}' ?
+			<form action="{{url_for('deleteitem', item_id=item_id.id)}}" method='POST'>
+
+				<div class="pull-right">
+					<button class="btn btn-danger btn-sm" type="submit" id="submit" type="submit">Delete</button>
+					<a class="btn btn-primary btn-sm" href='{{url_for('showcategory',category_id=item_id.category_id)}}'>
+					<span>Cancel</span></a>
+
+				</div>
+			</form>
+		</div>
+
+{% endblock %}
+

@@ -1,0 +1,28 @@
+{% extends "main.html" %} {% block content %} {% include "header.html"%}
+
+<div class="row">
+	<h2>{{item_id.name}}</h2>
+</div>
+<div class="row">
+	<h4>{{item_id.description}}</h4>
+</div>
+<div class="row">
+	{% if editable %}
+	<div class="col-md-1">
+		<a href="{{url_for('edititem', item_id =item_id.id)}}">
+			<h4>Edit</h4>
+		</a>
+	</div>
+	<div class="col-md-1">
+		<a href="{{url_for('deleteitem', item_id =item_id.id)}}">
+			<h4>Delete</h4>
+		</a>
+	</div>
+	{% endif %}
+	<div class="col-md-1">
+		<a href="{{url_for('showcategory', category_id=item_id.category_id)}}">
+			<h4>Back</h4>
+		</a>
+	</div>
+</div>
+{% endblock %}

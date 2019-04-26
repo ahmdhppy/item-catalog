@@ -3,7 +3,7 @@ from flask_googlelogin import GoogleLogin
 from app import app
 from models.models import Users, Categories, Items
 from flask_login import LoginManager, login_user,\
-    login_required, logout_user, current_user
+    login_required, logout_user, current_user, flash
 from flask import render_template, request, redirect, url_for, Response
 from forms import SigninForm, SignupForm, ItemForm
 from flask import jsonify
@@ -86,7 +86,6 @@ def edititem(item_id):
     """
     This function renders and displays the edit view for an item.
     """
-    print("asdasda")
     form = ItemForm()
     item_id = Items.query.filter_by(id=item_id).first()
     if item_id:

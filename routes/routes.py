@@ -4,9 +4,10 @@ from app import app
 from models.models import Users, Categories, Items
 from flask_login import LoginManager, login_user,\
     login_required, logout_user, current_user
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, Response
 from forms import SigninForm, SignupForm, ItemForm
 from flask import jsonify
+import dicttoxml
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -24,6 +25,12 @@ with login, signup, google authentication, endpoint API and home page.
 @googlelogin.oauth2callback
 def create_or_update_user(token, userinfo, **params):
     """
+    This function is responsible for the sign in
+    and sign up through Google accounts.
+    The Google account ID is passed to us,
+    it checks if the ID already exists if it does, then
+    it will log the user in using that Google account,
+     otherwise will create a new account for the user and then log them in.
     """
     user = Users.query.filter_by(username=userinfo['id']).first()
     if user:
@@ -41,6 +48,10 @@ def create_or_update_user(token, userinfo, **params):
 @app.route('/')
 @app.route('/home')
 def home():
+    """
+    This function renders the homepage along with
+     the Category and displays the latest created item.
+    """
     categories_ids = Categories.query.all()
     item_ids = Items.query.order_by(Items.id.desc()).limit(10).all()
     return render_template(
@@ -51,6 +62,9 @@ def home():
 
 @app.route('/showcategory/<int:category_id>', methods=['GET'])
 def showcategory(category_id):
+    """
+    This function renders and displays all items for a certain Category.
+    """
     categories_ids = Categories.query.all()
     category_id = Categories.query.filter_by(id=category_id).first()
     if category_id:
@@ -69,7 +83,10 @@ def showcategory(category_id):
 @app.route('/edititem/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edititem(item_id):
-    print("asdasda");
+    """
+    This function renders and displays the edit view for an item.
+    """
+    print("asdasda")
     form = ItemForm()
     item_id = Items.query.filter_by(id=item_id).first()
     if item_id:
@@ -98,6 +115,9 @@ def edititem(item_id):
 @app.route('/deleteitem/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def deleteitem(item_id):
+    """
+    This is the action for deleting an item.
+    """
     item_id = Items.query.filter_by(
         id=item_id).order_by(
         Items.id.desc()).first()
@@ -122,6 +142,9 @@ def deleteitem(item_id):
 @app.route('/newitem', methods=['GET', 'POST'])
 @login_required
 def newitem():
+    """
+    This renders the form for item creation.
+    """
     form = ItemForm()
     if form.validate_on_submit():
         vals = form.data
@@ -135,38 +158,67 @@ def newitem():
     return render_template('newitem.html', form=form)
 
 
-@app.route('/categories/json', methods=['GET'])
-@app.route('/categories/json/<int:categ_id>', methods=['GET'])
+@app.route('/categories', methods=['GET'])
+@app.route('/categories/<int:categ_id>', methods=['GET'])
 def json_categories(categ_id=None):
-    if categ_id:
-        categories = Categories.query.filter_by(id=categ_id).all()
-    else:
-        categories = Categories.query.all()
-    vals = {'categories': []}
-    for i in categories:
-        vals['categories'].append(i.serializable())
-        vals['categories'][-1]['items'] = \
-            [i.serializable()
-             for i in Items.query.filter_by(category_id=i.id).all()]
-    return jsonify(vals)
+    """
+    This action generates the endpoint API
+    for a single category or all of the categories.
+    """
+    if request.args.get('version') == '1':
+        if categ_id:
+            categories = Categories.query.filter_by(id=categ_id).all()
+        else:
+            categories = Categories.query.all()
+        vals = {'categories': []}
+        for i in categories:
+            vals['categories'].append(i.serializable())
+            vals['categories'][-1]['items'] = \
+                [i.serializable()
+                 for i in Items.query.filter_by(category_id=i.id).all()]
+        if request.args.get('type') == 'json':
+            return jsonify(vals)
+        elif request.args.get('type') == 'xml':
+            return Response(dicttoxml.dicttoxml(vals, attr_type=False),
+                            mimetype='text/xml')
+    msg = """Make sure the url contains two arguments 'version' and 'type'.
+Currently there are two types 'josn' and 'xml' and one version '1'"""
+    return Response(msg, mimetype='text/plain')
 
 
-@app.route('/items/json', methods=['GET'])
-@app.route('/items/json/<int:item_id>', methods=['GET'])
+@app.route('/items', methods=['GET'])
+@app.route('/items/<int:item_id>', methods=['GET'])
 def json_item(item_id=None):
-    if item_id:
-        items = Items.query.filter_by(id=item_id).all()
-    else:
-        items = Items.query.all()
-    vals = {'Items': []}
-    for i in items:
-        vals['Items'].append(i.serializable())
+    """
+    This action generates the endpoint API
+    for a single item or all of the items.
 
-    return jsonify(vals)
+    """
+    if request.args.get('version') == '1':
+        if item_id:
+            items = Items.query.filter_by(id=item_id).all()
+        else:
+            items = Items.query.all()
+        vals = {'Items': []}
+        for i in items:
+            vals['Items'].append(i.serializable())
+
+        if request.args.get('type') == 'json':
+            return jsonify(vals)
+        elif request.args.get('type') == 'xml':
+            return Response(dicttoxml.dicttoxml(vals, attr_type=False),
+                            mimetype='text/xml')
+    msg = """Make sure the url contains two arguments 'version' and 'type'.
+Currently there are two types 'josn' and 'xml' and one version '1'"""
+    return Response(msg, mimetype='text/plain')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    """
+    This is the sign up action, which makes sure the username
+    doesn't exist in order to create a new user with that username.
+    """
     if current_user.is_authenticated():
         return redirect(url_for('home'))
     form = SignupForm()
@@ -185,11 +237,20 @@ def signup():
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    The action that takes the ID of the user and browses/searches
+    for it in the database. This function is used by the login manager.
+    """
     return Users.browse(int(user_id))
 
 
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
+    """
+    This function renders the sign in form and makes sure
+    that the entered username and password are correct.
+    After they are checked it will login the user.
+    """
     if current_user.is_authenticated():
         return redirect(url_for('home'))
     form = SigninForm()
@@ -209,6 +270,9 @@ def signin():
 @app.route('/logout', methods=["GET"])
 @login_required
 def logout():
+    """
+    This is the logout action.
+    """
     if current_user.is_authenticated():
         logout_user()
     return redirect(url_for('home'))

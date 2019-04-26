@@ -69,19 +69,26 @@ class Users(BaseModel, UserMixin):
 
     @classmethod
     def create(cls, vals):
+        """
+        On new user creation this function is called and creates
+        an encrypted password for security.
+        """
         vals['password_hash'] = cls.encrypt_password(vals.pop('password', ''))
         return super(Users, cls).create(vals)
 
-    def write(self, vals):
-        if 'password' in vals:
-            vals['password_hash'] = self.encrypt_password(vals.pop('password'))
-        return super(Users, self).write(vals)
-
     @classmethod
     def _crypt_context(cls):
+        """
+        This function is used to retrieve the tool which
+        is used in encrypting the password for users.
+        """
         return default_crypt_context
 
     def _check_credentials(self, password):
+        """
+        This is the function that checks that the password and
+        username are correct and that they belong to each other.
+        """
         valid_pass, replacement = self._crypt_context(
         ).verify_and_update(password, self.password_hash)
         if replacement is not None:
@@ -92,14 +99,26 @@ class Users(BaseModel, UserMixin):
 
     @classmethod
     def encrypt_password(cls, password):
+        """
+        This function takes the password and encrypts it.
+        """
         return cls._crypt_context().encrypt(password)
 
     @classmethod
     def check_if_user_exists(cls, username):
+        """
+        This is the function that checks if the input username
+         exists in the database or not.
+        """
         return cls.query.filter_by(username=username).first()
 
     @classmethod
     def check_credentials(cls, vals):
+        """
+        This function receives the username and searches for it
+        in the database and checks that the password and username are correct.
+
+        """
         user = cls.query.filter_by(username=vals.get(
             'username', ''), login_with_google=False).first()
         return user and user._check_credentials(vals.get('password', ''))

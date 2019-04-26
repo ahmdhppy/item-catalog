@@ -5,17 +5,12 @@
 
  ## Project  Description:
 
-Item Catalogue is a Udacity Full Stack Nanodegree Project. 
-This project uses data storage to create a RESTFUL web app. 
-The features of this project are as follows:
-- Categories: Multilayered list of categories
-- Items: Items that fall under the categories
-- Users Functionality which includes the following
-    - Creation of users through sign up; either through manual creation or Google Account Sign In/Sign Up (Authentication Process). Along with standard login functionality
-    - Users gaining privileges to create items and then further edit the items they have created
-        - Created items are public which means they can be viewed (can be read) by non-users
-- Endpoint API: Prints item data in JSON. Readable by both machine and humans. This allows other applications/software to access or extract information easily from this web app. 
-    
+
+Item Catalogue is a Udacity Full Stack Nanodegree Project.
+This project uses data storage to create a RESTFUL web app. The features of this project are as follows; creation and display of multilayered item categories. Creation of items that fall under categories. User sign up and sign in functionality through either Google Account or manually. Users are also allowed to create items and edit or delete items that they have created.
+Endpoint API feature was also added which allows applications to access and extract information easily from this web app.
+
+
 
 
 ## Project contents
@@ -68,14 +63,14 @@ Item-Catalog/
 
 -   Python 2.7 https://www.python.org/
 -   Postgresql https://www.postgresql.org/
--   Python packages ``` Flask flask_bootstrap flask_sqlalchemy flask_googlelogin sqlalchemy_utils passlib flask_wtf psycopg2``` 
+-   Python packages ``` Flask flask_bootstrap flask_sqlalchemy flask_googlelogin sqlalchemy_utils passlib flask_wtf psycopg2 dicttoxml``` 
 
 ## Installation
 
 1.  Install required packages ```apt install postgresql  python2.7 python-pip postgresql-server-dev-all -y```
 
 
-    
+
 
 
 ## Steps to run this project
@@ -90,28 +85,31 @@ Item-Catalog/
 5. Create a database: ```python2.7 create_db.py -c <path of config file>```
 
 6. Insert demo cateogries: ```python2.7 insert_data.py -c <path of config file>```
-    
+
 7. Run the application: ```python2.7 app.py -c <path of config file>```
-    
+
 8. Finally Access and test your application by visiting  [http://localhost:5000](http://localhost:5000/).
 
    
     
 
 ## JSON Endpoints
-http://localhost:5000/categories/json
-- Return categories information
+The endpoints are avaialble in JSON and XML types, with the ability of creating multiple versions of each, however, in the current release of the web app there is only one version.
+The types (xml/json) are passed in an argument called "type". Version is passed in an argument called "version", the value of which is currently "1".
+####Examples
+http://localhost:5000/categories?type=json&version=1
+- Returns all category information in JSON type.
 
-```/categories/json/<int:categ_id>```
-http://localhost:5000/categories/json/35
-- Return category information
+```/categories/<int:categ_id>```
+http://localhost:5000/categories/3?type=xml&version=1
+- Return information for certain category in XML type by pass category ID.
 
-http://localhost:5000/items/json
-- Return items information
+http://localhost:5000/items?type=xml&version=1
+- Returns all item information in XML type.
 
-```/items/json/<int:item_id_id>```
-http://localhost:5000/items/json/35
-- Return item information
+```/items/json/<int:item_id>```
+http://localhost:5000/items/15?type=json&version=1
+- Return information for certain Item in JSON type by pass item ID.
 
 
 

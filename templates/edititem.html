@@ -13,7 +13,8 @@
     {{ wtf.form_field(form.description) }}
     {{ wtf.form_field(form.category_id) }}
   </div>
-	 <div class="col-md-6">
+	 <div class="col-md-6 custome-position">
+
 	<button class="btn  btn-primary btn-size save_bottom" type="submit">Save</button>
 	<a class="btn btn-danger btn-size cancel_btn" href='{{url_for('showcategory',category_id=item_id.category_id)}}'> <span>Cancel</span></a>
 

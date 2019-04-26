@@ -69,6 +69,7 @@ def showcategory(category_id):
 @app.route('/edititem/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edititem(item_id):
+    print("asdasda");
     form = ItemForm()
     item_id = Items.query.filter_by(id=item_id).first()
     if item_id:

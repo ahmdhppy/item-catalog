@@ -264,7 +264,7 @@ def signin():
             return redirect(url_for('signin'))
     return render_template(
         'signin.html', form=form, google_login_url=googlelogin.login_url(
-            redirect_uri=config['google_login_redirect_uri'))
+            redirect_uri=config['google_login_redirect_uri']))
 
 
 @app.route('/logout', methods=["GET"])

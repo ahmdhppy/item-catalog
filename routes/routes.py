@@ -7,6 +7,7 @@ from flask_login import LoginManager, login_user,\
 from flask import render_template, request, redirect, url_for, Response
 from forms import SigninForm, SignupForm, ItemForm
 from flask import jsonify
+from config.config import config
 import dicttoxml
 
 login_manager = LoginManager()
@@ -263,7 +264,7 @@ def signin():
             return redirect(url_for('signin'))
     return render_template(
         'signin.html', form=form, google_login_url=googlelogin.login_url(
-            redirect_uri='http://localhost:5000/oauth2callback'))
+            redirect_uri=config['google_login_redirect_uri'))
 
 
 @app.route('/logout', methods=["GET"])
